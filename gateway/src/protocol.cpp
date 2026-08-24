@@ -13,8 +13,7 @@ uint16_t crc16(const uint8_t* data, std::size_t len) {
 
 std::vector<uint8_t> encode(const Frame& f) {
     std::vector<uint8_t> b;
-    b.push_back(static_cast<uint8_t>(f.node_id >> 8));
-    b.push_back(static_cast<uint8_t>(f.node_id & 0xFF));
+    b.push_back(f.node_id);
     b.push_back(static_cast<uint8_t>(f.temperature >> 8));
     b.push_back(static_cast<uint8_t>(f.temperature & 0xFF));
     b.push_back(static_cast<uint8_t>(f.vibration >> 8));
@@ -23,17 +22,23 @@ std::vector<uint8_t> encode(const Frame& f) {
     const uint16_t c = crc16(b.data(), b.size());
     b.push_back(static_cast<uint8_t>(c >> 8));
     b.push_back(static_cast<uint8_t>(c & 0xFF));
-    return b;                              // 9 bytes: 7 payload + 2 CRC
+    return b; // 8 bytes: 6 payload + 2 CRC
 }
 
 std::optional<Frame> decode(const uint8_t* data, std::size_t len) {
-    if (len != 9) return std::nullopt;                 // tamanho errado
-    const uint16_t got = static_cast<uint16_t>(data[7] << 8 | data[8]);
-    if (crc16(data, 7) != got) return std::nullopt;    // CRC não bate
+    if (len != 8) return std::nullopt;
+
+    const uint16_t got =
+        static_cast<uint16_t>(data[6] << 8 | data[7]);
+
+    if (crc16(data, 6) != got)
+        return std::nullopt;
+
     Frame f;
-    f.node_id     = static_cast<uint16_t>(data[0] << 8 | data[1]);
-    f.temperature = static_cast<int16_t>(data[2] << 8 | data[3]);
-    f.vibration   = static_cast<uint16_t>(data[4] << 8 | data[5]);
-    f.health      = static_cast<Health>(data[6]);
+    f.node_id     = data[0];
+    f.temperature = static_cast<int16_t>(data[1] << 8 | data[2]);
+    f.vibration   = static_cast<uint16_t>(data[3] << 8 | data[4]);
+    f.health      = static_cast<Health>(data[5]);
+
     return f;
 }

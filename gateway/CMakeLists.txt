@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.20)
 project(pulselink_gateway CXX)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+find_package(Threads REQUIRED)
 
 include(FetchContent)
 FetchContent_Declare(Catch2
@@ -11,6 +12,9 @@ FetchContent_MakeAvailable(Catch2)
 
 add_library(protocol src/protocol.cpp)
 target_include_directories(protocol PUBLIC src)
+
+add_executable(gateway src/main.cpp src/can_reader.cpp)
+target_link_libraries(gateway PRIVATE protocol Threads::Threads)
 set_target_properties(protocol PROPERTIES CXX_CLANG_TIDY "clang-tidy")
 
 enable_testing()

@@ -9,7 +9,7 @@ enum class Health : uint8_t { NORMAL = 0, WARNING = 1, FAULT = 2 };
 
 // O frame de telemetria (payload que vai nos dados do CAN).
 struct Frame {
-    uint16_t node_id;      // que máquina/nó
+    uint8_t node_id;      // que máquina/nó
     int16_t  temperature;  // ºC * 100
     uint16_t vibration;    // unidade arbitrária
     Health   health;
