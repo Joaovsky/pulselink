@@ -1,0 +1,7 @@
+/ {
+    chosen { zephyr,canbus = &can_loopback0; };
+    can_loopback0: can_loopback0 {
+        compatible = "zephyr,can-loopback";
+        status = "okay";
+    };
+};
