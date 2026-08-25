@@ -17,6 +17,9 @@ add_executable(gateway src/main.cpp src/can_reader.cpp)
 target_link_libraries(gateway PRIVATE core Threads::Threads)
 set_target_properties(gateway PROPERTIES CXX_CLANG_TIDY "clang-tidy")
 
+add_executable(injector tools/injector.cpp src/can_writer.cpp)
+target_link_libraries(injector PRIVATE core Threads::Threads)
+
 enable_testing()
 add_executable(protocol_tests tests/test_protocol.cpp)
 target_link_libraries(protocol_tests PRIVATE core Catch2::Catch2WithMain)
@@ -25,3 +28,4 @@ add_test(NAME protocol_tests COMMAND protocol_tests)
 add_executable(processor_tests tests/test_processor.cpp)
 target_link_libraries(processor_tests PRIVATE core Catch2::Catch2WithMain)
 add_test(NAME processor_tests COMMAND processor_tests)
+
