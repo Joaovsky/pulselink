@@ -9,16 +9,37 @@ static struct cdev my_cdev;
 static char buffer[256];
 static size_t buf_len;
 
-static ssize_t dev_read(struct file *f, char __user *ubuf, size_t len, loff_t *off) {
-    if (*off >= buf_len) return 0;
-    if (len > buf_len - *off) len = buf_len - *off;
-    if (copy_to_user(ubuf, buffer + *off, len)) return -EFAULT;
-    *off += len; return len;
+static ssize_t dev_read(struct file *f, char __user *ubuf,
+                        size_t len, loff_t *off)
+{
+    if (*off >= buf_len)
+        return 0;
+
+    if (len > buf_len - *off)
+        len = buf_len - *off;
+
+    if (copy_to_user(ubuf, buffer + *off, len))
+        return -EFAULT;
+
+    pr_info("telemetry: dev_read: %zu bytes copied to userspace\n", len);
+
+    *off += len;
+    return len;
 }
-static ssize_t dev_write(struct file *f, const char __user *ubuf, size_t len, loff_t *off) {
-    if (len > sizeof(buffer)) len = sizeof(buffer);
-    if (copy_from_user(buffer, ubuf, len)) return -EFAULT;
-    buf_len = len; return len;
+static ssize_t dev_write(struct file *f, const char __user *ubuf,
+                         size_t len, loff_t *off)
+{
+    if (len > sizeof(buffer))
+        len = sizeof(buffer);
+
+    if (copy_from_user(buffer, ubuf, len))
+        return -EFAULT;
+
+    buf_len = len;
+
+    pr_info("telemetry: dev_write: %zu bytes copied to kernel buffer\n", len);
+
+    return len;
 }
 static struct file_operations fops = { .owner = THIS_MODULE, .read = dev_read, .write = dev_write };
 

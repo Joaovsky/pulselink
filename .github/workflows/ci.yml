@@ -1,0 +1,15 @@
+name: CI
+on: [push, pull_request]
+jobs:
+  gateway:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install deps
+        run: sudo apt-get update && sudo apt-get install -y cmake g++ clang-tidy
+      - name: Configure
+        run: cmake -S gateway -B gateway/build
+      - name: Build (com clang-tidy)
+        run: cmake --build gateway/build
+      - name: Test
+        run: ctest --test-dir gateway/build --output-on-failure
