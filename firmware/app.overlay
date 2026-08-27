@@ -1,7 +1,14 @@
 / {
-    chosen { zephyr,canbus = &can_loopback0; };
-    can_loopback0: can_loopback0 {
-        compatible = "zephyr,can-loopback";
+    chosen { zephyr,canbus = &canhost; };
+
+    canhost: canhost {
+        compatible = "zephyr,native-linux-can";
+        host-interface = "vcan0";
+        status = "okay";
+    };
+
+    simsensor0: simsensor {
+        compatible = "pulselink,simsensor";
         status = "okay";
     };
 };
