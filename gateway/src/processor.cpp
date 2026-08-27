@@ -1,5 +1,7 @@
 #include "processor.hpp"
 #include "logger.hpp"
+#include <unistd.h>
+#include <cstring>
 #include <cstdio>
 #include <string>
 
@@ -38,5 +40,12 @@ void Processor::handle(const Frame& f) {
     if (it != last_.end() && it->second != gw)
         log(lvl, std::string("  transition node=") + std::to_string(f.node_id) + ": "
                  + to_str(it->second) + " -> " + to_str(gw));
+
+    if (dev_fd_ >= 0) {
+        std::string line = std::string(buf) + "\n";
+        ssize_t w = write(dev_fd_, line.c_str(), line.size());
+        (void)w;
+    }
+                     
     last_[f.node_id] = gw;
 }

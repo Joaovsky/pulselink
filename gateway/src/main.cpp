@@ -6,6 +6,8 @@
 #include <iostream>
 #include <thread>
 #include <vector>
+#include <fcntl.h>
+#include <unistd.h>
 
 int main(int argc, char** argv) {
     const std::string ifname = (argc > 1) ? argv[1] : "vcan0";
@@ -25,6 +27,13 @@ int main(int argc, char** argv) {
     });
 
     Processor proc;
+    int dev = open("/dev/telemetry0", O_WRONLY);
+    if (dev >= 0) { 
+        proc.set_device_fd(dev); 
+        log(Level::INFO, "writing to /dev/telemetry0"); 
+    }
+    else log(Level::WARN, "/dev/telemetry0 not available (driver loaded?)");
+
     std::thread consumer([&] {
         while (auto item = queue.wait_pop()) {
             auto frame = decode(item->data(), item->size());
